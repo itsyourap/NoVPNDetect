@@ -1,7 +1,7 @@
 package me.hoshino.novpndetect.hooks
 
+import android.util.Log
 import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import me.hoshino.novpndetect.XHook
 import java.net.NetworkInterface
@@ -20,7 +20,7 @@ class HookNetworkInterface : XHook {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 // make apps unable to detect vpn
                 val name = (param.thisObject as NetworkInterface).name
-                XposedBridge.log("[NVD] NetworkInterface.isUp ($name)")
+                Log.i("NoVPNDetect", "NetworkInterface.isUp ($name)")
                 if (name.startsWith("tun") || name.startsWith("ppp") || name.startsWith("pptp")) {
                     param.result = false
                 }
