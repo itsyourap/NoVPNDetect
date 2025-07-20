@@ -4,6 +4,7 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
+import me.hoshino.novpndetect.TAG
 import me.hoshino.novpndetect.XHook
 
 class HookNetworkCapabilities : XHook {
@@ -20,10 +21,15 @@ class HookNetworkCapabilities : XHook {
     private fun hookHasTransport() {
         XposedHelpers.findAndHookMethod(NetworkCapabilities::class.java, "hasTransport", Int::class.java, object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
-                Log.i("NoVPNDetect", "NetworkCapabilities.hasTransport (${param.args[0]})")
-                if (param.args[0] == NetworkCapabilities.TRANSPORT_VPN) {
+                Log.i(TAG, "NetworkCapabilities.hasTransport(${param.args[0]})")
+                if (param.args[0] == NetworkCapabilities.TRANSPORT_VPN)
                     param.result = false
-                }
+                else if(param.args[0] == NetworkCapabilities.TRANSPORT_WIFI)
+                    param.result = true
+            }
+
+            override fun afterHookedMethod(param: MethodHookParam) {
+                Log.i(TAG, "NetworkCapabilities.hasTransport(${param.args[0]}) -> ${param.result}")
             }
         })
     }
@@ -31,7 +37,7 @@ class HookNetworkCapabilities : XHook {
     private fun hookGetCapabilities() {
         XposedHelpers.findAndHookMethod(NetworkCapabilities::class.java, "getCapabilities", object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
-                Log.i("NoVPNDetect", "NetworkCapabilities.getCapabilities")
+                Log.i(TAG, "NetworkCapabilities.getCapabilities() -> ${param.result}")
                 param.result ?: return
                 val result = param.result as IntArray
                 if (!result.contains(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)) {
@@ -49,12 +55,17 @@ class HookNetworkCapabilities : XHook {
     private fun hookHasCapability() {
         XposedHelpers.findAndHookMethod(NetworkCapabilities::class.java, "hasCapability", Int::class.java, object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
-                Log.i("NoVPNDetect", "NetworkCapabilities.hasCapability (${param.args[0]})")
-                if (param.args[0] == NetworkCapabilities.NET_CAPABILITY_NOT_VPN) {
+                Log.i(TAG, "NetworkCapabilities.hasCapability(${param.args[0]})")
+                if (param.args[0] == NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
                     param.result = true
-                } else if(param.args[0] == NetworkCapabilities.NET_CAPABILITY_INTERNET) {
+                else if(param.args[0] == NetworkCapabilities.NET_CAPABILITY_INTERNET)
                     param.result = true
-                }
+                else if(param.args[0] == NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                    param.result = true
+            }
+
+            override fun afterHookedMethod(param: MethodHookParam) {
+                Log.i(TAG, "NetworkCapabilities.hasCapability(${param.args[0]}) -> ${param.result}")
             }
         })
     }

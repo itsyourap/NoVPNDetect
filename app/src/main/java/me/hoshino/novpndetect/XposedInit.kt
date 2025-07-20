@@ -9,8 +9,9 @@ import me.hoshino.novpndetect.hooks.HookNetworkInfo
 import me.hoshino.novpndetect.hooks.HookNetworkInterface
 import me.hoshino.novpndetect.hooks.HookNetworkRequestBuilder
 
-class XposedInit : IXposedHookLoadPackage {
+const val TAG = "NoVPNDetect"
 
+class XposedInit : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam?) {
         lpparam ?: return
         XposedBridge.log("[NVD] handleLoadPackage: ${lpparam.packageName}")
