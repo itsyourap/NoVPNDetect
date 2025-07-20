@@ -17,7 +17,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -34,6 +34,4 @@ android {
 
 dependencies {
     compileOnly 'de.robv.android.xposed:api:82'
-
-    implementation 'androidx.core:core-ktx:1.7.0'
 }
